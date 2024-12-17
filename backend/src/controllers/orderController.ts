@@ -13,15 +13,21 @@ const placeOrder = async (req: Request, res: Response, next: NextFunction) => {
 
   try {
     const products = await Product.find({ _id: { $in: items } });
-    const hasInvalidProduct = products.some((item) => !item || item.price === null);
+    const productIds = products.map((item) => item._id.toString());
+    const invalidIds = items.filter((_id: string) => !productIds.includes(_id));
+    const isPriceless = products.some((item) => !item.price);
     const sumProducts = products.reduce((sum, item) => sum + (item.price || 0), 0);
 
     if (products.length === 0) {
       return next(new NotFoundError('Products not found'));
     }
 
-    if (hasInvalidProduct) {
-      return next(new BadRequestError('One or more products do not exist or have no price'));
+    if (invalidIds.length > 0) {
+      return next(new BadRequestError('One or more products do not exist'));
+    }
+
+    if (isPriceless) {
+      return next(new BadRequestError('One or more products have no price'));
     }
 
     if (sumProducts !== total) {
@@ -34,8 +40,7 @@ const placeOrder = async (req: Request, res: Response, next: NextFunction) => {
     };
 
     return res.status(201).send(response);
-  } catch (error) {
-    console.error('Error in placeOrder:', error);
+  } catch {
     return next(new InternalError('Internal server error'));
   }
 };
