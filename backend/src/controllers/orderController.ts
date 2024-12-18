@@ -3,7 +3,6 @@ import { faker } from '@faker-js/faker';
 import Product from '../models/productModel';
 import BadRequestError from '../errors/errorClasses/badRequestError';
 import NotFoundError from '../errors/errorClasses/notFoundError';
-import InternalError from '../errors/errorClasses/internalError';
 
 const placeOrder = async (req: Request, res: Response, next: NextFunction) => {
   const {
@@ -40,8 +39,8 @@ const placeOrder = async (req: Request, res: Response, next: NextFunction) => {
     };
 
     return res.status(201).send(response);
-  } catch {
-    return next(new InternalError('Internal server error'));
+  } catch (error) {
+    return next(error);
   }
 };
 

@@ -21,7 +21,6 @@
   "rules": {
     "no-shadow": "off",
     "@typescript-eslint/no-shadow": "warn",
-    "linebreak-style": ["error", "windows"],
     "import/extensions": [
       "error",
       "ignorePackages",

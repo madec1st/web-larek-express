@@ -1,20 +1,11 @@
-import { Request, Response } from 'express';
-import BadRequestError from '../errors/errorClasses/badRequestError';
-import NotFoundError from '../errors/errorClasses/notFoundError';
-import ConflictError from '../errors/errorClasses/conflictError';
+import { NextFunction, Request, Response } from 'express';
+import CustomError from '../errors/errorClasses/customError';
 
-const errorHandler = (err: Error, _req: Request, res: Response) => {
-  if (err instanceof BadRequestError) {
-    return res.status(400).json({ message: err.message });
-  }
-  if (err instanceof NotFoundError) {
-    return res.status(404).json({ message: err.message });
-  }
-  if (err instanceof ConflictError) {
-    return res.status(409).json({ message: err.message });
-  }
-
-  return res.status(500).json({ message: 'Internal server error' });
+const errorHandler = (err: CustomError, _req: Request, res: Response, next: NextFunction) => {
+  const statusCode = err.statusCode || 500;
+  const message = statusCode === 500 ? 'Internal Server Error' : err.message;
+  res.status(statusCode).send({ message });
+  next();
 };
 
 export default errorHandler;
